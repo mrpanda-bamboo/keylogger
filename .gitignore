@@ -1,0 +1,31 @@
+# 🔹 Python Cache / Build
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+
+# 🔹 PyInstaller build files
+build/
+dist/
+*.spec
+
+# 🔹 DLLs / Executables
+*.exe
+*.dll
+
+# 🔹 Webhook Config
+cache.db
+
+# 🔹 System / IDE Junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# 🔹 VSCode / PyCharm / JetBrains
+.vscode/
+.idea/
+
+# 🔹 Icon files (optional – falls du es nicht versionieren willst)
+*.ico
