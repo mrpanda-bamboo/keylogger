@@ -22,7 +22,7 @@ A fully featured keylogger written in Python. It captures keystrokes, clipboard 
 To compile the script into a standalone executable using **PyInstaller**:
 
 ```bash
-pyinstaller --onefile --noconsole --icon="icon_path.ico" keylogger.py
+pyinstaller --onefile --noconsole --icon="icon_path.ico" Keylogger_Code.py
 ```
 
 Replace `icon_path.ico` with your actual icon file path.  
@@ -56,9 +56,10 @@ The file may contain many fake system log lines to disguise its true purpose.
 
 | File                 | Description                                         |
 |----------------------|-----------------------------------------------------|
-| `keylogger.py`       | Main Python source code                             |
-| `systemupdater.log`  | Contains the Discord webhook URL (camouflaged)      |
-| `dist/keylogger.exe` | Final compiled binary using PyInstaller             |
+| `Base64_webhook_encoder.py` | Utility to store an encoded Discord webhook in `cache.db` |
+| `Keylogger_Code.py`  | Main Python keylogger script                        |
+| `LICENSE`            | MIT license information                             |
+| `README.md`          | This documentation                                  |
 
 ---
 
