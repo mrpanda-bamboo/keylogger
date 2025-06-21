@@ -1,9 +1,9 @@
-```markdown
+
 # 🛡️ Keylogger
 
 A fully featured keylogger written in Python. It captures keystrokes, clipboard changes, and system information, and sends the data securely to a hidden Discord webhook.
 
----
+
 
 ## ⚙️ Features
 
@@ -15,7 +15,7 @@ A fully featured keylogger written in Python. It captures keystrokes, clipboard 
 - 🚫 Automatically exits if no valid webhook is found
 - 🧊 Compatible with both development and compiled environments
 
----
+
 
 ## 🔧 Compilation Instructions
 
