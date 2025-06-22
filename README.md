@@ -49,7 +49,7 @@ pyinstaller --onefile --noconsole --icon="icon.ico" systemupdater.py
 ### 🧪 Installer Binary (installer.exe)
 
 ```bash
-pyinstaller --onefile --noconsole --icon="icon.ico" installer.py
+pyinstaller --onefile --console --icon="icon.ico" installer.py
 ```
 
 ### 🧪 DLL (update.dll)
